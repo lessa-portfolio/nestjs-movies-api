@@ -1,18 +1,15 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UserController } from './controllers/user.controller';
-import { UserService } from './services/user.service';
-import { UserModel, UserSchema } from './models/user.model';
+
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('YOUR_URI'),
-    MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema }]),
+    MongooseModule.forRoot('mongodb+srv://lucaslessa:r4AWS8r43ByuSYSy@cluster0.iuzcqez.mongodb.net/'),
+    UserModule
   ],
-  controllers: [AppController, UserController],
-  providers: [AppService, UserService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
