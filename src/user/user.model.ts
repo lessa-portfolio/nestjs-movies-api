@@ -27,5 +27,3 @@ UserSchema.statics.findUserByEmail = function (email: string) {
 };
 
 export const UserModel = model<User, UserModel>('User', UserSchema);
-
-// export const UserModel = model<User>('User', UserSchema);
