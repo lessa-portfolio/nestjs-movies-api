@@ -21,10 +21,15 @@
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/jwt": "^10.1.0",
     "@nestjs/mongoose": "^10.0.0",
+    "@nestjs/passport": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "mongoose": "^7.3.4",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1"
   },
@@ -52,6 +57,7 @@
     "typescript": "^5.1.3"
   },
   "jest": {
+    "preset": "ts-jest",
     "moduleFileExtensions": [
       "js",
       "json",
@@ -62,8 +68,15 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "collectCoverage": true,
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/**/*.ts",
+      "!src/**/*.spec.ts"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "clover"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
