@@ -1,7 +1,8 @@
 /* eslint-disable prettier/prettier */
-import { Schema, Document, model, Model } from 'mongoose';
+import { Schema, model, Model } from 'mongoose';
 
-export interface User extends Document {
+export interface User {
+  id?: string;
   name: string;
   email: string;
   password: string;

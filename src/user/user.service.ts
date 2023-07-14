@@ -9,8 +9,7 @@ export class UserService {
   constructor(@InjectModel('User') private userModel: Model<User>) {}
 
   async createUser(userData: User): Promise<User> {
-    const newUser = new this.userModel(userData);
-    return newUser.save();
+    return this.userModel.create(userData);
   }
 
   async findUserById(id: string): Promise<User> {
