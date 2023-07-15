@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../models/user.model';
@@ -14,14 +14,33 @@ export class LikeService {
   ) {}
 
   async addLike(userId: string, movieId: string): Promise<void> {
-    const user = await this.userModel.findOne({ _id: userId });
+    const user = await this.userModel.findById(userId);
     const movie = await this.movieModel.findOne({ ref: movieId });
+    
+    if (!user) throw new UnauthorizedException();
+    if (!movie) throw new UnauthorizedException();
 
-    if (!user || !movie) throw new Error('User or movie not found');
-
+    if (user.movies.includes(movieId) || movie.users.includes(userId)) return;
+    
     user.movies.push(new ObjectId(movie._id).toString());
     movie.users.push(userId);
+    
+    await user.save();
+    await movie.save();
+  }
 
+  async removeLike(userId: string, movieId: string): Promise<void> {
+    const user = await this.userModel.findById(userId);
+    const movie = await this.movieModel.findOne({ ref: movieId });
+    
+    if (!user) throw new UnauthorizedException();
+    if (!movie) throw new UnauthorizedException();
+
+    if (!user.movies.includes(movieId) || !movie.users.includes(userId)) return;
+    
+    user.movies = user.movies.filter((id) => id !== movieId);
+    movie.users = movie.users.filter((id) => id !== userId);
+    
     await user.save();
     await movie.save();
   }

@@ -3,8 +3,8 @@ import { Controller, Post, Body, Request } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
 
-@Controller('likes')
-export class LikeController {
+@Controller('dislikes')
+export class DislikeController {
   constructor(
     private readonly likeService: LikeService,
     private readonly jwtStrategy: JwtStrategy
@@ -17,7 +17,7 @@ export class LikeController {
 
     const userId = this.jwtStrategy.decodeToken(token);
 
-    await this.likeService.addLike(userId, body.movieId);
+    await this.likeService.removeLike(userId, body.movieId);
 
     return true;
   }

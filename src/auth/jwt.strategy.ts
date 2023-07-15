@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { AuthService } from './auth.service';
 import { User } from '../models/user.model';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -14,11 +15,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any): Promise<User> {
-    const user = await this.authService.validateUserById(payload.sub);
+  decodeToken(token: any): string {
+    const decodedToken = jwt.verify(token, 'chave_secreta');
+
+    const userId = decodedToken.sub.toString();
     
-    if (!user) throw new UnauthorizedException();
-    
-    return user;
+    return userId;
   }
 }
