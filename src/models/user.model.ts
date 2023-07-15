@@ -6,12 +6,14 @@ export interface User {
   name: string;
   email: string;
   password: string;
+  movies: string[];
 }
 
 export const UserSchema = new Schema<User>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, index: true },
   password: { type: String, required: true },
+  movies: [{ type: Schema.Types.ObjectId, ref: 'Movie' }],
 });
 
 export interface UserModel extends Model<User> {
