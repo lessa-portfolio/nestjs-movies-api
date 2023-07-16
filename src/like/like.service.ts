@@ -13,14 +13,30 @@ export class LikeService {
     @InjectModel('Movie') private movieModel: Model<Movie>,
   ) {}
 
+  async getMoviesLikedByUser(userId: string): Promise<string[]> {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) throw new UnauthorizedException();
+
+    const likedMovieIds = user.movies;
+
+    const likedMovies = await this.movieModel.find({ _id: { $in: likedMovieIds } });
+    
+    const likedMovieRefs = likedMovies.map(movie => movie.ref);
+
+    return likedMovieRefs;
+  }
+
   async addLike(userId: string, movieId: string): Promise<void> {
     const user = await this.userModel.findById(userId);
     const movie = await this.movieModel.findOne({ ref: movieId });
     
-    if (!user) throw new UnauthorizedException();
-    if (!movie) throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException('user not found');
+    if (!movie) throw new UnauthorizedException('movie not found');
 
-    if (user.movies.includes(movieId) || movie.users.includes(userId)) return;
+    if (user.movies.includes(movieId) || movie.users.includes(userId)) {
+      throw new UnauthorizedException('movie already liked');
+    }
     
     user.movies.push(new ObjectId(movie._id).toString());
     movie.users.push(userId);
@@ -29,17 +45,21 @@ export class LikeService {
     await movie.save();
   }
 
-  async removeLike(userId: string, movieId: string): Promise<void> {
+  async removeLike(userId: string, movieRef: string): Promise<void> {
     const user = await this.userModel.findById(userId);
-    const movie = await this.movieModel.findOne({ ref: movieId });
+    const movie = await this.movieModel.findOne({ ref: movieRef });
     
-    if (!user) throw new UnauthorizedException();
-    if (!movie) throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException('user not found');
+    if (!movie) throw new UnauthorizedException('movie not found');
+    
+    const movieId = new ObjectId(movie._id).toString();
 
-    if (!user.movies.includes(movieId) || !movie.users.includes(userId)) return;
+    if (!user.movies.includes(movieId) && !movie.users.includes(userId)) {
+      throw new UnauthorizedException('movie already disliked');
+    }
     
-    user.movies = user.movies.filter((id) => id !== movieId);
-    movie.users = movie.users.filter((id) => id !== userId);
+    movie.users = movie.users.filter((id) => id.toString() !== userId);
+    user.movies = user.movies.filter((id) => id.toString() !== movieId);
     
     await user.save();
     await movie.save();

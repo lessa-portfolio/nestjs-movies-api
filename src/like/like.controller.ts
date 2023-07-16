@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Post, Body, Request } from '@nestjs/common';
+import { Controller, Post, Body, Request, UnauthorizedException, Get } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
 
@@ -10,15 +10,46 @@ export class LikeController {
     private readonly jwtStrategy: JwtStrategy
   ) {}
 
-  @Post()
-  async addLike(@Request() request: any, @Body() body: { userId: string, movieId: string }): Promise<boolean> {
+  @Post('like')
+  async addLike(@Request() request: any, @Body() body: { userId: string, movieId: string }): Promise<void> {
+    const token = request.headers.authorization.split(' ')[1];
     
+    try {
+      const userId = this.jwtStrategy.decodeToken(token);
+      await this.likeService.addLike(userId, body.movieId);
+      return;
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token expired');
+      }
+      throw new UnauthorizedException(error.message);
+    }
+  }
+
+  @Post('dislike')
+  async removeLike(@Request() request: any, @Body() body: { userId: string, movieId: string }): Promise<void> {
+    const token = request.headers.authorization.split(' ')[1];
+
+    try {
+      const userId = this.jwtStrategy.decodeToken(token);
+      await this.likeService.removeLike(userId, body.movieId);
+      return;
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token expired');
+      }
+      throw new UnauthorizedException(error.message);
+    }
+  }
+
+  @Get()
+  async getMoviesLikedByUser(@Request() request: any): Promise<string[]> {
     const token = request.headers.authorization.split(' ')[1];
 
     const userId = this.jwtStrategy.decodeToken(token);
 
-    await this.likeService.addLike(userId, body.movieId);
+    const movies = await this.likeService.getMoviesLikedByUser(userId);
 
-    return true;
+    return movies;
   }
 }
