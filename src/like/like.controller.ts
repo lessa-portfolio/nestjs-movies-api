@@ -14,6 +14,8 @@ export class LikeController {
   async addLike(@Request() request: any, @Body() body: { userId: string, movieId: string }): Promise<void> {
     const token = request.headers.authorization.split(' ')[1];
     
+    if (!token) throw new UnauthorizedException('jwt must be provided');
+    
     try {
       const userId = this.jwtStrategy.decodeToken(token);
       await this.likeService.addLike(userId, body.movieId);
@@ -29,6 +31,8 @@ export class LikeController {
   @Post('dislike')
   async removeLike(@Request() request: any, @Body() body: { userId: string, movieId: string }): Promise<void> {
     const token = request.headers.authorization.split(' ')[1];
+
+    if (!token) throw new UnauthorizedException('jwt must be provided');
 
     try {
       const userId = this.jwtStrategy.decodeToken(token);
@@ -46,10 +50,19 @@ export class LikeController {
   async getMoviesLikedByUser(@Request() request: any): Promise<string[]> {
     const token = request.headers.authorization.split(' ')[1];
 
-    const userId = this.jwtStrategy.decodeToken(token);
+    if (!token) throw new UnauthorizedException('jwt must be provided');
 
-    const movies = await this.likeService.getMoviesLikedByUser(userId);
-
-    return movies;
+    try {
+      const userId = this.jwtStrategy.decodeToken(token);
+  
+      const movies = await this.likeService.getMoviesLikedByUser(userId);
+  
+      return movies;
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token expired');
+      }
+      throw new UnauthorizedException(error.message);
+    }
   }
 }
