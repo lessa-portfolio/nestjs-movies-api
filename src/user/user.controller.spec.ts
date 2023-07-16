@@ -2,7 +2,7 @@
 import { Test } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { User, UserSchema } from './user.model';
+import { User, UserSchema } from '../models/user.model';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
@@ -14,7 +14,7 @@ describe('UserController', () => {
     beforeAll(async () => {
         const moduleRef = await Test.createTestingModule({
             imports: [
-                MongooseModule.forRoot('MONGO_URI'),
+                MongooseModule.forRoot('mongodb+srv://lucaslessa:r4AWS8r43ByuSYSy@cluster0.iuzcqez.mongodb.net/'),
                 MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])
             ],
             controllers: [UserController],
@@ -32,6 +32,7 @@ describe('UserController', () => {
                 name: 'John',
                 email: 'john@example.com',
                 password: 'password',
+                movies: []
             };
 
             const newUser: User = {

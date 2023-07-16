@@ -2,13 +2,12 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './jwt.strategy';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 import { AuthController } from './auth.controller';
 import { UserModule } from '../user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema } from 'src/user/user.model';
+import { UserSchema } from 'src/models/user.model';
 
 @Module({
   imports: [
@@ -20,7 +19,7 @@ import { UserSchema } from 'src/user/user.model';
       signOptions: { expiresIn: '1h' },
     })
   ],
-  providers: [AuthService, JwtStrategy, UserService],
+  providers: [AuthService, UserService],
   controllers: [AuthController],
 })
 export class AuthModule {}
