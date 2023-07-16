@@ -2,7 +2,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { Model } from 'mongoose';
-import { User } from './user.model';
+import { User } from '../models/user.model';
 import { getModelToken } from '@nestjs/mongoose';
 
 describe('UserService', () => {
@@ -13,6 +13,7 @@ describe('UserService', () => {
         name: 'John Doe',
         email: 'john@example.com',
         password: 'password',
+        movies: []
     }
 
     beforeEach(async () => {
@@ -41,6 +42,7 @@ describe('UserService', () => {
                 name: 'John Doe',
                 email: 'john@example.com',
                 password: 'password',
+                movies: []
             };
 
             const createdUser = await userService.createUser(userData);
