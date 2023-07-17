@@ -14,14 +14,6 @@ export class MovieService {
     return this.movieModel.create(movieData);
   }
 
-  async findMovieById(id: string): Promise<Movie> {
-    return this.movieModel.findById(id).exec();
-  }
-
-  async findMovieByRef(ref: string): Promise<Movie> {
-    return this.movieModel.findOne({ ref }).exec();
-  }
-
   async getMoviesWithUserCount(): Promise<any[]> {
     const movies = await this.movieModel.find().exec();
     const moviesWithUserCount = movies.map((movie) => ({
@@ -29,8 +21,6 @@ export class MovieService {
       userCount: movie.users.length,
     }));
 
-    const sortedMovies = moviesWithUserCount.sort((a, b) => b.userCount - a.userCount);
-
-    return sortedMovies;
+    return moviesWithUserCount;
   }
 }
